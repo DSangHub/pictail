@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pictail — Seller upload</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #12151a;
+      --muted: #5c6470;
+      --line: #e6e2d9;
+      --paper: #f7f4ee;
+      --card: #fffdf8;
+      --accent: #c45c26;
+      --accent-2: #1f4d3a;
+      --pin: #c45c26;
+      --shadow: 0 18px 50px rgba(18, 21, 26, 0.14);
+      --ok: #1f4d3a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Outfit, system-ui, sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+    header {
+      position: sticky; top: 0; z-index: 30;
+      background: rgba(247, 244, 238, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav {
+      max-width: 1280px; margin: 0 auto; padding: 0 20px;
+      height: 60px; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: -0.03em; }
+    .mark {
+      width: 26px; height: 26px; border-radius: 7px; background: var(--accent); color: #fff;
+      display: grid; place-items: center; font-size: 13px;
+    }
+    .mode {
+      display: flex; background: #efeae1; border-radius: 999px; padding: 3px;
+    }
+    .mode button {
+      border: 0; background: transparent; padding: 7px 14px; border-radius: 999px;
+      font: 600 13px Outfit, sans-serif; cursor: pointer; color: var(--muted);
+    }
+    .mode button.on { background: #fff; color: var(--ink); box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+    .saved { font-size: 12px; color: var(--ok); font-weight: 600; min-height: 16px; }
+    .shell {
+      max-width: 1280px; margin: 0 auto; padding: 18px 20px 48px;
+      display: grid; grid-template-columns: 1fr 340px; gap: 20px;
+    }
+    .stage-wrap { min-width: 0; }
+    .hint { font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+    .hint b { color: var(--ink); }
+    .samples { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+    .samples button, .file-btn {
+      border: 1px solid var(--line); background: #fff; border-radius: 999px;
+      padding: 6px 12px; font: 500 12px Outfit, sans-serif; cursor: pointer;
+    }
+    .samples button.on { background: var(--ink); color: #fff; border-color: var(--ink); }
+    .file-btn { display: inline-flex; align-items: center; gap: 6px; }
+    .stage {
+      background: #111; border-radius: 20px; overflow: hidden; box-shadow: var(--shadow);
+      position: relative;
+    }
+    .viewer {
+      position: relative; aspect-ratio: 16/10; background: #1c1c1c; cursor: crosshair;
+    }
+    .viewer.preview { cursor: default; }
+    .viewer img { width: 100%; height: 100%; object-fit: contain; display: block; background: #111; }
+    .empty {
+      position: absolute; inset: 0; display: grid; place-items: center; color: #bbb; text-align: center;
+      font-size: 15px; padding: 24px;
+    }
+    .pin {
+      position: absolute; width: 18px; height: 18px; border-radius: 50%;
+      background: #fff; border: 3px solid var(--pin);
+      transform: translate(-50%, -50%); cursor: pointer;
+      box-shadow: 0 0 0 7px rgba(196,92,38,.16);
+      z-index: 2;
+    }
+    .pin.draft { border-color: #2b6cb0; box-shadow: 0 0 0 7px rgba(43,108,176,.2); }
+    .pin.active, .pin:hover { background: var(--pin); }
+    .pin.draft.active, .pin.draft:hover { background: #2b6cb0; }
+    .ghost {
+      position: absolute; width: 18px; height: 18px; border-radius: 50%;
+      border: 2px dashed #fff; transform: translate(-50%, -50%);
+      pointer-events: none; opacity: .7; display: none; z-index: 1;
+    }
+    .popup {
+      position: absolute; min-width: 210px; max-width: 260px;
+      background: #fffdf8; border-radius: 14px; padding: 12px 14px;
+      box-shadow: var(--shadow); z-index: 4; display: none;
+    }
+    .popup.show { display: block; }
+    .popup strong { display: block; font-size: 14px; margin-bottom: 4px; }
+    .popup p { font-size: 13px; color: var(--muted); }
+    .popup .meta { margin-top: 8px; font-size: 12px; font-weight: 600; color: var(--accent-2); }
+    .panel {
+      background: var(--card); border: 1px solid var(--line); border-radius: 18px;
+      padding: 16px; height: fit-content; position: sticky; top: 76px;
+    }
+    .panel h2 {
+      font-family: "Instrument Serif", Georgia, serif;
+      font-size: 26px; font-weight: 400; margin-bottom: 4px;
+    }
+    .panel .sub { color: var(--muted); font-size: 13px; margin-bottom: 14px; }
+    label { display: block; font-size: 12px; font-weight: 600; margin: 10px 0 5px; }
+    input, textarea, select {
+      width: 100%; border: 1px solid var(--line); background: #fff; border-radius: 10px;
+      padding: 9px 11px; font: 14px Outfit, sans-serif; color: var(--ink);
+    }
+    textarea { min-height: 78px; resize: vertical; }
+    .row { display: flex; gap: 8px; margin-top: 12px; }
+    .btn {
+      border: 0; cursor: pointer; border-radius: 999px; padding: 10px 14px;
+      font: 600 13px Outfit, sans-serif; flex: 1;
+    }
+    .btn-primary { background: var(--ink); color: #fff; }
+    .btn-primary:disabled { opacity: .35; cursor: not-allowed; }
+    .btn-ghost { background: #efeae1; color: var(--ink); }
+    .btn-danger { background: #f3e4dc; color: #8a3314; }
+    .pins { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
+    .pin-row {
+      border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px;
+      display: flex; justify-content: space-between; gap: 8px; align-items: flex-start;
+      cursor: pointer; background: #fff;
+    }
+    .pin-row.on { border-color: var(--accent); background: #fff7f1; }
+    .pin-row b { display: block; font-size: 13px; }
+    .pin-row span { font-size: 12px; color: var(--muted); }
+    .coords { font-variant-numeric: tabular-nums; font-size: 11px; color: #8a8376; }
+    .toast {
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+      background: var(--ink); color: #fff; padding: 10px 16px; border-radius: 999px;
+      font-size: 13px; font-weight: 600; display: none; z-index: 50;
+    }
+    @media (max-width: 900px) {
+      .shell { grid-template-columns: 1fr; }
+      .panel { position: static; }
+      .viewer { aspect-ratio: 4/3; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="nav">
+      <div class="logo"><span class="mark">P</span> Pictail seller</div>
+      <div class="mode">
+        <button class="on" id="editMode" type="button">Edit pins</button>
+        <button id="buyMode" type="button">Buyer preview</button>
+      </div>
+      <div class="saved" id="savedNote"></div>
+    </div>
+  </header>
+  <div class="shell">
+    <section class="stage-wrap">
+      <p class="hint" id="hint"><b>Click the picture</b> to drop a pin. Keep each fact short so the photo stays in view.</p>
+      <div class="samples">
+        <button type="button" data-src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1600&q=80" data-name="House exterior">House</button>
+        <button type="button" data-src="https://images.unsplash.com/photo-1556912173-46c336c7fd55?auto=format&fit=crop&w=1600&q=80" data-name="Kitchen">Kitchen</button>
+        <button type="button" data-src="https://images.unsplash.com/photo-1619767886558-efdc259cde1a?auto=format&fit=crop&w=1600&q=80" data-name="Car">Car</button>
+        <label class="file-btn">Upload yours<input type="file" id="file" accept="image/*" hidden /></label>
+      </div>
+      <div class="stage">
+        <div class="viewer" id="viewer">
+          <img id="photo" alt="Listing photo" />
+          <div class="empty" id="empty">Choose a sample or upload a photo</div>
+          <div id="pins"></div>
+          <div class="ghost" id="ghost"></div>
+          <div class="popup" id="popup"></div>
+        </div>
+      </div>
+    </section>
+    <aside class="panel">
+      <h2 id="formTitle">New pin</h2>
+      <p class="sub" id="formSub">Click the photo. Details save onto that spot.</p>
+      <label for="title">Title</label>
+      <input id="title" maxlength="48" placeholder="Quartz island" />
+      <label for="body">Short fact</label>
+      <textarea id="body" maxlength="180" placeholder="8-ft island, seating for four. Remodel 2023."></textarea>
+      <label for="tag">Tag</label>
+      <select id="tag">
+        <option value="Feature">Feature</option>
+        <option value="Upgrade">Upgrade</option>
+        <option value="Spec">Spec</option>
+        <option value="Condition">Condition</option>
+        <option value="Room">Room</option>
+      </select>
+      <div class="coords" id="coords">No point yet</div>
+      <div class="row">
+        <button class="btn btn-ghost" type="button" id="cancelBtn">Cancel</button>
+        <button class="btn btn-primary" type="button" id="saveBtn" disabled>Save pin</button>
+      </div>
+      <div class="row">
+        <button class="btn btn-danger" type="button" id="deleteBtn" hidden>Remove pin</button>
+      </div>
+      <div class="pins" id="list"></div>
+    </aside>
+  </div>
+  <div class="toast" id="toast"></div>
+  <script>
+    const KEY = "pictail-seller-mock-v1";
+    const state = { src: "", name: "", pins: [], draft: null, selected: null, mode: "edit" };
+    const photo = document.getElementById("photo");
+    const viewer = document.getElementById("viewer");
+    const pinsEl = document.getElementById("pins");
+    const ghost = document.getElementById("ghost");
+    const popup = document.getElementById("popup");
+    const empty = document.getElementById("empty");
+    const title = document.getElementById("title");
+    const body = document.getElementById("body");
+    const tag = document.getElementById("tag");
+    const coords = document.getElementById("coords");
+    const saveBtn = document.getElementById("saveBtn");
+    const deleteBtn = document.getElementById("deleteBtn");
+    const list = document.getElementById("list");
+    const hint = document.getElementById("hint");
+    const savedNote = document.getElementById("savedNote");
+    function uid() { return "p_" + Math.random().toString(36).slice(2, 9); }
+    function persist() {
+      localStorage.setItem(KEY, JSON.stringify({ src: state.src, name: state.name, pins: state.pins }));
+      savedNote.textContent = state.pins.length ? state.pins.length + " pin" + (state.pins.length === 1 ? "" : "s") + " on this photo" : "";
+    }
+    function restore() {
+      try {
+        const raw = JSON.parse(localStorage.getItem(KEY) || "null");
+        if (raw && raw.src) {
+          state.src = raw.src; state.name = raw.name || ""; state.pins = raw.pins || [];
+          setPhoto(state.src, state.name, false);
+        }
+      } catch (e) {}
+    }
+    function setPhoto(src, name, resetPins) {
+      state.src = src; state.name = name; photo.src = src; empty.style.display = "none";
+      document.querySelectorAll(".samples button").forEach(b => b.classList.toggle("on", b.dataset.src === src));
+      if (resetPins) { state.pins = []; state.draft = null; state.selected = null; resetForm(); }
+      persist(); draw();
+    }
+    function pctFromEvent(e) {
+      const r = photo.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width;
+      const y = (e.clientY - r.top) / r.height;
+      if (x < 0 || y < 0 || x > 1 || y > 1) return null;
+      return { x: +x.toFixed(4), y: +y.toFixed(4) };
+    }
+    function resetForm() {
+      title.value = ""; body.value = ""; tag.value = "Feature";
+      coords.textContent = "No point yet"; saveBtn.disabled = true; deleteBtn.hidden = true;
+      document.getElementById("formTitle").textContent = "New pin";
+      document.getElementById("formSub").textContent = "Click the photo. Details save onto that spot.";
+      state.selected = null; state.draft = null;
+    }
+    function loadPin(pin) {
+      state.selected = pin.id; state.draft = null;
+      title.value = pin.title; body.value = pin.body; tag.value = pin.tag;
+      coords.textContent = "x " + Math.round(pin.x * 100) + "%  ·  y " + Math.round(pin.y * 100) + "%";
+      saveBtn.disabled = !title.value.trim(); deleteBtn.hidden = false;
+      document.getElementById("formTitle").textContent = "Edit pin";
+      document.getElementById("formSub").textContent = "Change the fact. The picture stays put.";
+    }
+    function draw() {
+      pinsEl.innerHTML = "";
+      const items = state.pins.slice();
+      if (state.draft) items.push({ ...state.draft, draft: true });
+      items.forEach(p => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "pin" + (p.draft ? " draft" : "") + (state.selected === p.id ? " active" : "");
+        b.style.left = (p.x * 100) + "%"; b.style.top = (p.y * 100) + "%";
+        b.setAttribute("aria-label", p.title || "New pin");
+        b.addEventListener("click", ev => {
+          ev.stopPropagation();
+          if (state.mode === "preview") { showPopup(p, b); return; }
+          loadPin(p); hidePopup(); draw();
+        });
+        if (state.mode === "preview") {
+          b.addEventListener("mouseenter", () => showPopup(p, b));
+          b.addEventListener("mouseleave", hidePopupIfHover);
+        }
+        pinsEl.appendChild(b);
+      });
+      list.innerHTML = state.pins.map(p => `
+        <div class="pin-row ${state.selected === p.id ? "on" : ""}" data-id="${p.id}">
+          <div><b>${escapeHtml(p.title || "Untitled")}</b><span>${escapeHtml(p.body || "")}</span></div>
+          <div class="coords">${p.tag}</div>
+        </div>`).join("") || '<p class="sub">No pins yet.</p>';
+      list.querySelectorAll(".pin-row").forEach(row => {
+        row.onclick = () => {
+          const pin = state.pins.find(p => p.id === row.dataset.id);
+          if (pin) { loadPin(pin); draw(); }
+        };
+      });
+    }
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, c => ({ "&":"&","<":"<",">":">","\"":""","'":"&#39;" }[c]));
+    }
+    function showPopup(p, pinEl) {
+      popup.innerHTML = `<strong>${escapeHtml(p.title || "Untitled")}</strong><p>${escapeHtml(p.body || "")}</p><div class="meta">${escapeHtml(p.tag || "")}</div>`;
+      popup.classList.add("show");
+      const vr = viewer.getBoundingClientRect();
+      const pr = pinEl.getBoundingClientRect();
+      let left = pr.left - vr.left + 16;
+      let top = pr.top - vr.top - 8;
+      if (left + 270 > vr.width) left = pr.left - vr.left - 250;
+      if (top + 130 > vr.height) top = pr.top - vr.top - 110;
+      popup.style.left = Math.max(8, left) + "px";
+      popup.style.top = Math.max(8, top) + "px";
+    }
+    function hidePopup() { popup.classList.remove("show"); }
+    function hidePopupIfHover() { if (matchMedia("(hover: hover)").matches) hidePopup(); }
+    viewer.addEventListener("mousemove", e => {
+      if (state.mode !== "edit" || !state.src) return;
+      const p = pctFromEvent(e);
+      if (!p) { ghost.style.display = "none"; return; }
+      ghost.style.display = "block";
+      ghost.style.left = (p.x * 100) + "%"; ghost.style.top = (p.y * 100) + "%";
+    });
+    viewer.addEventListener("mouseleave", () => { ghost.style.display = "none"; });
+    viewer.addEventListener("click", e => {
+      if (state.mode !== "edit" || !state.src) { hidePopup(); return; }
+      if (e.target.classList.contains("pin")) return;
+      const p = pctFromEvent(e);
+      if (!p) return;
+      state.draft = { id: uid(), x: p.x, y: p.y, title: "", body: "", tag: tag.value };
+      state.selected = state.draft.id;
+      title.value = ""; body.value = "";
+      coords.textContent = "x " + Math.round(p.x * 100) + "%  ·  y " + Math.round(p.y * 100) + "%";
+      saveBtn.disabled = true; deleteBtn.hidden = true;
+      document.getElementById("formTitle").textContent = "New pin";
+      document.getElementById("formSub").textContent = "Name the spot. One short fact.";
+      title.focus(); hidePopup(); draw();
+    });
+    title.addEventListener("input", () => {
+      saveBtn.disabled = !title.value.trim() || !(state.draft || state.selected);
+    });
+    document.getElementById("saveBtn").onclick = () => {
+      const payload = {
+        id: state.draft ? state.draft.id : state.selected,
+        x: state.draft ? state.draft.x : state.pins.find(p => p.id === state.selected).x,
+        y: state.draft ? state.draft.y : state.pins.find(p => p.id === state.selected).y,
+        title: title.value.trim(), body: body.value.trim(), tag: tag.value
+      };
+      const i = state.pins.findIndex(p => p.id === payload.id);
+      if (i >= 0) state.pins[i] = payload; else state.pins.push(payload);
+      state.draft = null; state.selected = payload.id; persist();
+      toast("Pin saved on the picture"); deleteBtn.hidden = false;
+      document.getElementById("formTitle").textContent = "Edit pin"; draw();
+    };
+    document.getElementById("cancelBtn").onclick = () => { resetForm(); draw(); };
+    document.getElementById("deleteBtn").onclick = () => {
+      state.pins = state.pins.filter(p => p.id !== state.selected);
+      persist(); resetForm(); draw(); toast("Pin removed");
+    };
+    document.querySelectorAll(".samples button").forEach(btn => {
+      btn.onclick = () => setPhoto(btn.dataset.src, btn.dataset.name, true);
+    });
+    document.getElementById("file").onchange = e => {
+      const f = e.target.files[0]; if (!f) return;
+      setPhoto(URL.createObjectURL(f), f.name, true);
+    };
+    document.getElementById("editMode").onclick = () => setMode("edit");
+    document.getElementById("buyMode").onclick = () => setMode("preview");
+    function setMode(mode) {
+      state.mode = mode;
+      document.getElementById("editMode").classList.toggle("on", mode === "edit");
+      document.getElementById("buyMode").classList.toggle("on", mode === "preview");
+      viewer.classList.toggle("preview", mode === "preview");
+      hint.innerHTML = mode === "edit"
+        ? "<b>Click the picture</b> to drop a pin. Keep each fact short so the photo stays in view."
+        : "<b>Buyer view.</b> Hover or tap a pin. The listing never leaves the photo.";
+      ghost.style.display = "none"; hidePopup(); draw();
+    }
+    function toast(msg) {
+      const t = document.getElementById("toast");
+      t.textContent = msg; t.style.display = "block";
+      clearTimeout(t._id); t._id = setTimeout(() => { t.style.display = "none"; }, 1600);
+    }
+    restore(); draw();
+  </script>
+</body>
+</html>
