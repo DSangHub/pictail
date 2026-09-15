@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pictail — Details live on the picture</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root { --ink:#12151a; --muted:#5c6470; --line:#e6e2d9; --paper:#f7f4ee; --card:#fffdf8; --accent:#c45c26; --green:#1f4d3a; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Outfit, system-ui, sans-serif; background: var(--paper); color: var(--ink); }
+    .wrap { max-width: 880px; margin: 0 auto; padding: 56px 22px 80px; }
+    .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; margin-bottom: 28px; }
+    .mark { width: 28px; height: 28px; border-radius: 8px; background: var(--accent); color: #fff; display: grid; place-items: center; }
+    h1 { font-family: "Instrument Serif", Georgia, serif; font-size: clamp(40px, 7vw, 68px); font-weight: 400; letter-spacing: -0.03em; line-height: 0.95; }
+    h1 em { font-style: italic; color: var(--green); }
+    .lede { margin: 18px 0 32px; color: var(--muted); font-size: 18px; max-width: 48ch; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    a.card { text-decoration: none; color: inherit; background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 22px; display: block; }
+    a.card:hover { border-color: #cfc3b4; }
+    a.card h2 { font-size: 18px; margin-bottom: 8px; }
+    a.card p { color: var(--muted); font-size: 14px; }
+    .tag { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); font-weight: 600; margin-bottom: 8px; }
+    footer { margin-top: 40px; font-size: 13px; color: var(--muted); }
+    footer a { color: var(--ink); }
+    @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="logo"><span class="mark">P</span> Pictail</div>
+    <h1>Put the details <em>on</em> the picture.</h1>
+    <p class="lede">Hover or tap a pin. The listing stays on the photo instead of disappearing under a long description.</p>
+    <div class="grid">
+      <a class="card" href="pictail-prototype.html">
+        <div class="tag">Buyer</div>
+        <h2>Live listing</h2>
+        <p>House, kitchen, and car photos with hover and tap pins.</p>
+      </a>
+      <a class="card" href="pictail-seller-mock.html">
+        <div class="tag">Seller</div>
+        <h2>Upload mock</h2>
+        <p>Drop a pin on a photo, save a short fact, preview the buyer view.</p>
+      </a>
+    </div>
+    <footer>Source: <a href="https://github.com/DSangHub/pictail">github.com/DSangHub/pictail</a></footer>
+  </div>
+</body>
+</html>
