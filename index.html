@@ -4,6 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pictail — Details live on the picture</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#c45c26" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Pictail" />
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="icons/icon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -16,13 +23,24 @@
     .mark { width: 28px; height: 28px; border-radius: 8px; background: var(--accent); color: #fff; display: grid; place-items: center; }
     h1 { font-family: "Instrument Serif", Georgia, serif; font-size: clamp(40px, 7vw, 68px); font-weight: 400; letter-spacing: -0.03em; line-height: 0.95; }
     h1 em { font-style: italic; color: var(--green); }
-    .lede { margin: 18px 0 32px; color: var(--muted); font-size: 18px; max-width: 48ch; }
+    .lede { margin: 18px 0 28px; color: var(--muted); font-size: 18px; max-width: 48ch; }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 28px; }
+    .btn {
+      border: 0; cursor: pointer; text-decoration: none;
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 18px; border-radius: 999px; font-weight: 600; font-size: 14px; font-family: inherit;
+    }
+    .btn-primary { background: var(--ink); color: #fff; }
+    .btn-ghost { background: transparent; border: 1px solid #cfc9bc; color: var(--ink); }
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     a.card { text-decoration: none; color: inherit; background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 22px; display: block; }
     a.card:hover { border-color: #cfc3b4; }
     a.card h2 { font-size: 18px; margin-bottom: 8px; }
     a.card p { color: var(--muted); font-size: 14px; }
     .tag { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); font-weight: 600; margin-bottom: 8px; }
+    .how { margin-top: 36px; background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 22px; }
+    .how h3 { margin-bottom: 10px; }
+    .how li { color: var(--muted); font-size: 14px; margin-left: 18px; margin-bottom: 6px; }
     footer { margin-top: 40px; font-size: 13px; color: var(--muted); }
     footer a { color: var(--ink); }
     @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
@@ -32,7 +50,11 @@
   <div class="wrap">
     <div class="logo"><span class="mark">P</span> Pictail</div>
     <h1>Put the details <em>on</em> the picture.</h1>
-    <p class="lede">Hover or tap a pin. The listing stays on the photo instead of disappearing under a long description.</p>
+    <p class="lede">Install it on a phone or PC from the browser. No App Store. No Play Store. It is a website that can live on the home screen.</p>
+    <div class="actions">
+      <button class="btn btn-primary" id="installBtn" type="button">Install on this device</button>
+      <a class="btn btn-ghost" href="https://github.com/DSangHub/pictail/archive/refs/heads/main.zip">Download ZIP for PC</a>
+    </div>
     <div class="grid">
       <a class="card" href="pictail-prototype.html">
         <div class="tag">Buyer</div>
@@ -45,7 +67,17 @@
         <p>Drop a pin on a photo, save a short fact, preview the buyer view.</p>
       </a>
     </div>
+    <div class="how">
+      <h3>Keep it without an app</h3>
+      <ul>
+        <li><b>iPhone / iPad:</b> Safari → Share → Add to Home Screen.</li>
+        <li><b>Android:</b> Chrome menu → Install app or Add to Home screen.</li>
+        <li><b>Windows / Mac:</b> Chrome or Edge menu → Install Pictail. Opens in its own window.</li>
+        <li><b>Offline copy:</b> Download ZIP, unzip, open index.html. Photos still need internet.</li>
+      </ul>
+    </div>
     <footer>Source: <a href="https://github.com/DSangHub/pictail">github.com/DSangHub/pictail</a></footer>
   </div>
+  <script src="pwa.js"></script>
 </body>
 </html>
