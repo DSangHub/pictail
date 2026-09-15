@@ -1,0 +1,19 @@
+{
+  "name": "Pictail",
+  "short_name": "Pictail",
+  "description": "Picture-first listings. Details live on the photo.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f7f4ee",
+  "theme_color": "#c45c26",
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any maskable"
+    }
+  ]
+}
