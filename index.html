@@ -23,7 +23,32 @@
     .mark { width: 28px; height: 28px; border-radius: 8px; background: var(--accent); color: #fff; display: grid; place-items: center; }
     h1 { font-family: "Instrument Serif", Georgia, serif; font-size: clamp(40px, 7vw, 68px); font-weight: 400; letter-spacing: -0.03em; line-height: 0.95; }
     h1 em { font-style: italic; color: var(--green); }
-    .lede { margin: 18px 0 28px; color: var(--muted); font-size: 18px; max-width: 48ch; }
+    .lede { margin: 18px 0 18px; color: var(--muted); font-size: 18px; max-width: 52ch; }
+    .pitch { font-size: 20px; line-height: 1.45; max-width: 38ch; margin: 0 0 28px; }
+    .shots { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px; }
+    .shot {
+      position: relative; border-radius: 18px; overflow: hidden; background: #111;
+      aspect-ratio: 4/3; box-shadow: 0 18px 50px rgba(18,21,26,.12);
+    }
+    .shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .shot .label {
+      position: absolute; left: 12px; bottom: 12px;
+      background: rgba(18,21,26,.72); color: #fff; font-size: 12px;
+      padding: 6px 10px; border-radius: 999px;
+    }
+    .shot .pin {
+      position: absolute; width: 18px; height: 18px; border-radius: 50%;
+      background: #fff; border: 3px solid var(--accent);
+      transform: translate(-50%, -50%); cursor: pointer;
+      box-shadow: 0 0 0 7px rgba(196,92,38,.2);
+    }
+    .shot .pop {
+      position: absolute; max-width: 220px; background: #fffdf8; color: var(--ink);
+      border-radius: 12px; padding: 10px 12px; font-size: 13px; display: none;
+      box-shadow: 0 12px 30px rgba(18,21,26,.18);
+    }
+    .shot .pop.show { display: block; }
+    .shot .pop strong { display: block; margin-bottom: 4px; }
     .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 28px; }
     .btn {
       border: 0; cursor: pointer; text-decoration: none;
@@ -43,14 +68,31 @@
     .how li { color: var(--muted); font-size: 14px; margin-left: 18px; margin-bottom: 6px; }
     footer { margin-top: 40px; font-size: 13px; color: var(--muted); }
     footer a { color: var(--ink); }
-    @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
+    @media (max-width: 640px) { .grid, .shots { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="logo"><span class="mark">P</span> Pictail</div>
     <h1>Put the details <em>on</em> the picture.</h1>
-    <p class="lede">Install it on a phone or PC from the browser. No App Store. No Play Store. It is a website that can live on the home screen.</p>
+    <p class="pitch">Don’t let your customers lose their train of thought to a beautiful picture. Add a description that pops up when clicked or touched. Let the pictures hit home and do the selling.</p>
+    <p class="lede">Tap a pin on the home interior or the car. The fact stays on the photo.</p>
+    <div class="shots">
+      <div class="shot" data-shot="home">
+        <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1400&q=80" alt="Home interior living room" />
+        <button class="pin" style="left:36%;top:62%" type="button" data-title="Living room" data-body="Light stays on the sofa. Facts stay on the photo — no scroll away from the room." aria-label="Living room detail"></button>
+        <button class="pin" style="left:78%;top:40%" type="button" data-title="Windows" data-body="South light. Dual-pane. The upgrade is on the glass, not buried in a paragraph." aria-label="Windows detail"></button>
+        <div class="pop"></div>
+        <div class="label">Home interior · tap a pin</div>
+      </div>
+      <div class="shot" data-shot="auto">
+        <img src="https://images.unsplash.com/photo-1619767886558-efdc259cde1a?auto=format&fit=crop&w=1400&q=80" alt="Automobile exterior" />
+        <button class="pin" style="left:30%;top:55%" type="button" data-title="Front clip" data-body="Factory paint. No respray. The buyer sees the panel and the fact together." aria-label="Front clip detail"></button>
+        <button class="pin" style="left:68%;top:48%" type="button" data-title="Wheels" data-body="OEM 20-in. New tires. Touch the corner that matters." aria-label="Wheels detail"></button>
+        <div class="pop"></div>
+        <div class="label">Automobile exterior · tap a pin</div>
+      </div>
+    </div>
     <div class="actions">
       <button class="btn btn-primary" id="installBtn" type="button">Install on this device</button>
       <a class="btn btn-ghost" href="https://github.com/DSangHub/pictail/archive/refs/heads/main.zip">Download ZIP for PC</a>
@@ -78,6 +120,25 @@
     </div>
     <footer>Source: <a href="https://github.com/DSangHub/pictail">github.com/DSangHub/pictail</a></footer>
   </div>
+  <script>
+    document.querySelectorAll(".shot").forEach(function (shot) {
+      var pop = shot.querySelector(".pop");
+      shot.querySelectorAll(".pin").forEach(function (pin) {
+        pin.addEventListener("click", function (e) {
+          e.stopPropagation();
+          pop.innerHTML = "<strong>" + pin.dataset.title + "</strong>" + pin.dataset.body;
+          pop.classList.add("show");
+          var left = pin.offsetLeft + 14;
+          var top = pin.offsetTop - 8;
+          if (left + 220 > shot.clientWidth) left = pin.offsetLeft - 210;
+          if (top + 90 > shot.clientHeight) top = pin.offsetTop - 90;
+          pop.style.left = Math.max(8, left) + "px";
+          pop.style.top = Math.max(8, top) + "px";
+        });
+      });
+      shot.addEventListener("click", function () { pop.classList.remove("show"); });
+    });
+  </script>
   <script src="pwa.js"></script>
 </body>
 </html>
